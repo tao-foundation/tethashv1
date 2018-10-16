@@ -10,32 +10,32 @@
 		},
 		{
 			"checksumSHA1": "exEIOkzQrq9M+59RLaXEwhDxGUo=",
-			"path": "github.com/ethereum/go-ethereum/crypto",
+			"path": "github.com/tao-foundation/tethashv1-geth/crypto",
 			"revision": "cc13d576f07fb6803e09fb42880591a67b8b0ef6",
 			"revisionTime": "2017-04-07T08:03:11Z"
 		},
 		{
 			"checksumSHA1": "TMVztwYLcQlIio/kEqbF8TQYWYg=",
-			"path": "github.com/ethereum/go-ethereum/crypto/secp256k1",
+			"path": "github.com/tao-foundation/tethashv1-geth/crypto/secp256k1",
 			"revision": "cc13d576f07fb6803e09fb42880591a67b8b0ef6",
 			"revisionTime": "2017-04-07T08:03:11Z",
 			"tree": true
 		},
 		{
 			"checksumSHA1": "yunX3AjO6JiMz0NSY/krvG3VWsk=",
-			"path": "github.com/ethereum/go-ethereum/crypto/sha3",
+			"path": "github.com/tao-foundation/tethashv1-geth/crypto/sha3",
 			"revision": "cc13d576f07fb6803e09fb42880591a67b8b0ef6",
 			"revisionTime": "2017-04-07T08:03:11Z"
 		},
 		{
 			"checksumSHA1": "NbRntdNRuwam0wGGNJ6HrR83P0M=",
-			"path": "github.com/ethereum/go-ethereum/log",
+			"path": "github.com/tao-foundation/tethashv1-geth/log",
 			"revision": "cc13d576f07fb6803e09fb42880591a67b8b0ef6",
 			"revisionTime": "2017-04-07T08:03:11Z"
 		},
 		{
 			"checksumSHA1": "ERaBPyDJCbMQRJsR6Kpqkr7dqfg=",
-			"path": "github.com/ethereum/go-ethereum/rlp",
+			"path": "github.com/tao-foundation/tethashv1-geth/rlp",
 			"revision": "cc13d576f07fb6803e09fb42880591a67b8b0ef6",
 			"revisionTime": "2017-04-07T08:03:11Z"
 		},
@@ -46,5 +46,5 @@
 			"revisionTime": "2016-05-14T03:44:11Z"
 		}
 	],
-	"rootPath": "github.com/ethereum/ethash"
+	"rootPath": "github.com/tao-foundation/tethashv1"
 }
