@@ -93,7 +93,7 @@ extern "C" {
  */
   static inline uint32_t fnv1a_hash(uint32_t u, uint32_t v)
   {
-    return (u ^ v) * FNV_PRIME;
+    return ((((FNV_OFFSET_BASIS ^ u) * FNV_PRIME) ^ v) * FNV_PRIME);
   }
 
 #ifdef __cplusplus
