@@ -34,14 +34,16 @@ pyethash = Extension('pyethash',
                      extra_compile_args=["-Isrc/", "-std=gnu99", "-Wall"])
 
 setup(
-    name='pyethash',
+    name='pytethashv1',
+    author="Trustfarm",
     author="Matthew Wampler-Doty",
+    author_email="info@tao.foundation",
     author_email="matthew.wampler.doty@gmail.com",
     license='GPL',
     version='0.1.23',
-    url='https://github.com/ethereum/ethash',
-    download_url='https://github.com/ethereum/ethash/tarball/v23',
-    description=('Python wrappers for ethash, the ethereum proof of work'
+    url='https://github.com/tao-foundation/tethashv1',
+    download_url='https://github.com/tao-foundation/tethashv1/tarball/v11',
+    description=('Python wrappers for tethashv1, the TAO TEO TEthashV1 proof of work'
                  'hashing function'),
-    ext_modules=[pyethash],
+    ext_modules=[pytethashv1],
 )

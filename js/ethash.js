@@ -1,3 +1,7 @@
+// TethashV1.js
+// TAO.Foundation
+// (c) 2018
+
 // ethash.js
 // Tim Hughes <tim@twistedfury.com>
 // Revision 19
@@ -14,10 +18,20 @@ function mod32(x, n)
 	return (x>>>0) % (n>>>0);
 }
 
-function fnv(x, y)
-{
+function fnv(x, y) {
 	// js integer multiply by 0x01000193 will lose precision
-	return ((x*0x01000000 | 0) + (x*0x193 | 0)) ^ y;	
+	return ((x * 0x01000000 | 0) + (x * 0x193 | 0)) ^ y;
+}
+
+// FNV1A for TEthashV1
+// FNV_OFFSET_BASIS 0x811c9dc5
+function fnv1a(x, y) {
+	// js integer multiply by 0x01000193 will lose precision
+	var ox = (0x811c9dc5 ^ x);
+	ox = (ox * 0x01000000 | 0) + (ox * 0x193 | 0)
+	oy = ox ^ y
+	oy = (oy * 0x01000000 | 0) + (oy * 0x193 | 0)
+	return  oy;
 }
 
 function computeCache(params, seedWords)
@@ -71,11 +85,11 @@ function computeDagNode(o_node, params, cache, keccak, nodeIndex)
 	for (var p = 0; p < dagParents; ++p)
 	{
 		// compute cache node (word) index
-		c = mod32(fnv(nodeIndex ^ p, mix[p&15]), cacheNodeCount) << 4;
+		c = mod32(fnv1a(nodeIndex ^ p, mix[p&15]), cacheNodeCount) << 4;
 		
 		for (var w = 0; w < 16; ++w)
 		{
-			mix[w] = fnv(mix[w], cache[c|w]);
+			mix[w] = fnv1a(mix[w], cache[c|w]);
 		}
 	}
 	
@@ -100,7 +114,7 @@ function computeHashInner(mix, params, cache, keccak, tempNode)
 	
 	for (var a = 0; a < mixParents; ++a)
 	{
-		var p = mod32(fnv(s0 ^ a, mix[a & (mixWordCount-1)]), dagPageCount);
+		var p = mod32(fnv1a(s0 ^ a, mix[a & (mixWordCount-1)]), dagPageCount);
 		var d = (p * mixNodeCount)|0;
 		
 		for (var n = 0, w = 0; n < mixNodeCount; ++n, w += 16)
@@ -109,7 +123,7 @@ function computeHashInner(mix, params, cache, keccak, tempNode)
 			
 			for (var v = 0; v < 16; ++v)
 			{
-				mix[w|v] = fnv(mix[w|v], tempNode[v]);
+				mix[w|v] = fnv1a(mix[w|v], tempNode[v]);
 			}
 		}
 	}
@@ -171,7 +185,7 @@ exports.Ethash = function(params, seed)
 		// compress mix and append to initWords
 		for (var i = 0; i != mixWords.length; i += 4)
 		{
-			initWords[16 + i/4] = fnv(fnv(fnv(mixWords[i], mixWords[i+1]), mixWords[i+2]), mixWords[i+3]);
+			initWords[16 + i/4] = fnv1a(fnv1a(fnv1a(mixWords[i], mixWords[i+1]), mixWords[i+2]), mixWords[i+3]);
 		}
 			
 		// final Keccak hashes
