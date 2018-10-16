@@ -19,7 +19,7 @@ package ethash
 import (
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/tao-foundation/tethashv1-geth/common"
 )
 
 type Block interface {
