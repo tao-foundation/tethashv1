@@ -59,8 +59,10 @@ FNV prime	FNV offset basis
 extern "C" {
 #endif
 
+#ifndef __TETHASHV1__
 #define __TETHASHV1__
 #undef __ETHASH__
+#endif
 
 #define FNV_PRIME 0x01000193
 #define FNV_OFFSET_BASIS 0x811c9dc5

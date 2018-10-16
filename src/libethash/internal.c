@@ -71,6 +71,10 @@ FNV prime	FNV offset basis
 #include "sha3.h"
 #endif // WITH_CRYPTOPP
 
+#ifndef __TETHASHV1__
+#define __TETHASHV1__
+#endif
+
 uint64_t ethash_get_datasize(uint64_t const block_number)
 {
 	assert(block_number / ETHASH_EPOCH_LENGTH < 2048);
