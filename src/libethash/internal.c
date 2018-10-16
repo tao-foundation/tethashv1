@@ -1,3 +1,33 @@
+#define __TETHASHV1__
+#undef __ETHASH__
+/*
+  (C)TAO.Foundation for TETHASHV1 modification. GPL V3 License term.
+  https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV-1_hash
+
+  FNV_hash0 is depricated
+  use FNV1 hash
+
+use hash offset
+FNV-1a hash
+The FNV-1a hash differs from the FNV-1 hash by only the order in which the multiply and XOR is
+performed:[8][10]
+
+   hash = FNV_offset_basis
+   for each byte_of_data to be hashed
+    hash = hash XOR byte_of_data
+    hash = hash × FNV_prime
+   return hash
+
+Size in bits
+{\displaystyle n=2^{s}} {\displaystyle n=2^{s}}
+
+FNV prime	FNV offset basis
+32	224 + 28 + 0x93 = 16777619
+
+2166136261 = 0x811c9dc5
+*/
+
+
 /*
   This file is part of ethash.
 
@@ -102,6 +132,7 @@ void ethash_calculate_dag_item(
 	memcpy(ret, init, sizeof(node));
 	ret->words[0] ^= node_index;
 	SHA3_512(ret->bytes, ret->bytes, sizeof(node));
+/*
 #if defined(_M_X64) && ENABLE_SSE
 	__m128i const fnv_prime = _mm_set1_epi32(FNV_PRIME);
 	__m128i xmm0 = ret->xmm[0];
@@ -109,11 +140,17 @@ void ethash_calculate_dag_item(
 	__m128i xmm2 = ret->xmm[2];
 	__m128i xmm3 = ret->xmm[3];
 #endif
-
+*/
 	for (uint32_t i = 0; i != ETHASH_DATASET_PARENTS; ++i) {
+
+#if defined(__TETHASHV1__)
+		uint32_t parent_index = fnv1a_hash(node_index ^ i, ret->words[i % NODE_WORDS]) % num_parent_nodes;
+#else	// __ETHASH__
 		uint32_t parent_index = fnv_hash(node_index ^ i, ret->words[i % NODE_WORDS]) % num_parent_nodes;
+#endif
 		node const *parent = &cache_nodes[parent_index];
 
+/*
 #if defined(_M_X64) && ENABLE_SSE
 		{
 			xmm0 = _mm_mullo_epi32(xmm0, fnv_prime);
@@ -131,13 +168,18 @@ void ethash_calculate_dag_item(
 			ret->xmm[2] = xmm2;
 			ret->xmm[3] = xmm3;
 		}
-		#else
+#else 
+*/
 		{
 			for (unsigned w = 0; w != NODE_WORDS; ++w) {
+#if defined(__TETHASHV1__)
+				ret->words[w] = fnv1a_hash(ret->words[w], parent->words[w]);
+#else // __ETHASH__
 				ret->words[w] = fnv_hash(ret->words[w], parent->words[w]);
+#endif
 			}
 		}
-#endif
+/* #endif */ // _SSE_ENABLE
 	}
 	SHA3_512(ret->bytes, ret->bytes, sizeof(node));
 }
@@ -203,8 +245,11 @@ static bool ethash_hash(
 	unsigned const num_full_pages = (unsigned) (full_size / page_size);
 
 	for (unsigned i = 0; i != ETHASH_ACCESSES; ++i) {
+#if defined(__TETHASHV1__)
+		uint32_t const index = fnv1a_hash(s_mix->words[0] ^ i, mix->words[i % MIX_WORDS]) % num_full_pages;
+#else	// __ETHASH__
 		uint32_t const index = fnv_hash(s_mix->words[0] ^ i, mix->words[i % MIX_WORDS]) % num_full_pages;
-
+#endif
 		for (unsigned n = 0; n != MIX_NODES; ++n) {
 			node const* dag_node;
 			if (full_nodes) {
@@ -215,6 +260,7 @@ static bool ethash_hash(
 				dag_node = &tmp_node;
 			}
 
+/*
 #if defined(_M_X64) && ENABLE_SSE
 			{
 				__m128i fnv_prime = _mm_set1_epi32(FNV_PRIME);
@@ -227,13 +273,18 @@ static bool ethash_hash(
 				mix[n].xmm[2] = _mm_xor_si128(xmm2, dag_node->xmm[2]);
 				mix[n].xmm[3] = _mm_xor_si128(xmm3, dag_node->xmm[3]);
 			}
-			#else
+#else
+*/
 			{
 				for (unsigned w = 0; w != NODE_WORDS; ++w) {
+#if defined(__TETHASHV1__)
+					mix[n].words[w] = fnv1a_hash(mix[n].words[w], dag_node->words[w]);
+#else // __ETHASH__
 					mix[n].words[w] = fnv_hash(mix[n].words[w], dag_node->words[w]);
+#endif
 				}
 			}
-#endif
+/* #endif */ // _M64_X64 , SSE ifdef
 		}
 
 	}
@@ -241,10 +292,17 @@ static bool ethash_hash(
 	// compress mix
 	for (uint32_t w = 0; w != MIX_WORDS; w += 4) {
 		uint32_t reduction = mix->words[w + 0];
-		reduction = reduction * FNV_PRIME ^ mix->words[w + 1];
-		reduction = reduction * FNV_PRIME ^ mix->words[w + 2];
-		reduction = reduction * FNV_PRIME ^ mix->words[w + 3];
+#if defined(__TETHASHV1__)
+		reduction = fnv1a_hash(reduction, mix->words[w + 1]);
+		reduction = fnv1a_hash(reduction, mix->words[w + 2]);
+		reduction = fnv1a_hash(reduction, mix->words[w + 3]);
 		mix->words[w / 4] = reduction;
+#else 	// __ETHASH__
+		reduction = fnv_hash(reduction, mix->words[w + 1]);
+		reduction = fnv_hash(reduction, mix->words[w + 2]);
+		reduction = fnv_hash(reduction, mix->words[w + 3]);
+		mix->words[w / 4] = reduction;
+#endif
 	}
 
 	fix_endian_arr32(mix->words, MIX_WORDS / 4);
